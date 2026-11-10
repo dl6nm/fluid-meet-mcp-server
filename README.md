@@ -27,6 +27,25 @@ files directly.
 
 If FluidVoice is not in `/Applications`, set **Path to fv-serve** in the extension's settings.
 
+#### About the install warning
+
+During installation, Claude Desktop says the extension gets *"access to everything on your
+computer"* and that the developer information *"has not been verified by Anthropic"*. Claude Desktop
+shows this text for **every** local extension. Extensions have no way to declare narrower
+permissions, so the text doesn't describe what this server actually does:
+
+- It only ever starts one program, FluidVoice's `fv-serve` (by default
+  `/Applications/FluidVoice.app/Contents/Helpers/fv-serve`).
+- It only calls `fv-serve`'s read-only subcommands: `meet list|show|summary|search`, `status`,
+  `skill`. It uses an argument list and no shell, and validates every input.
+- Its code writes no files, opens no network connections, and doesn't read FluidVoice's data directly.
+- All tools are marked `readOnlyHint` for MCP clients.
+
+The whole server is a single file of about 300 lines,
+[`src/fluidmeet_mcp/server.py`](src/fluidmeet_mcp/server.py). Please read it before installing.
+The manual config and Claude Code installs below run the same code with the same rights; they just
+don't show a dialog.
+
 ### Claude Desktop (manual config)
 
 This needs [uv](https://docs.astral.sh/uv/). Add the following to
