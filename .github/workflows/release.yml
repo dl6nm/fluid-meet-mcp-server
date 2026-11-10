@@ -1,0 +1,50 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --locked
+      - run: uv run pytest -q
+
+  bundle:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check versions match
+        run: |
+          v_manifest=$(jq -r .version manifest.json)
+          v_py=$(grep -m1 '^version' pyproject.toml | cut -d'"' -f2)
+          test "$v_manifest" = "$v_py" || { echo "manifest $v_manifest != pyproject $v_py"; exit 1; }
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            test "v$v_manifest" = "${GITHUB_REF_NAME}" || { echo "tag $GITHUB_REF_NAME != v$v_manifest"; exit 1; }
+          fi
+      - run: npx -y @anthropic-ai/mcpb@2.1.2 validate manifest.json
+      - run: mkdir -p dist && npx -y @anthropic-ai/mcpb@2.1.2 pack . dist/fluidmeet.mcpb
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fluidmeet.mcpb
+          path: dist/fluidmeet.mcpb
+      - name: Attach to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 \
+            || gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --generate-notes
+          gh release upload "$GITHUB_REF_NAME" dist/fluidmeet.mcpb --clobber
