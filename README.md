@@ -121,8 +121,10 @@ uv run fluidmeet-mcp                  # run the server on stdio
 npx -y @anthropic-ai/mcpb@2.1.2 pack . dist/fluidmeet.mcpb   # build the Claude Desktop bundle
 ```
 
-To release: bump `version` in both `pyproject.toml` and `manifest.json`, then push a tag such as
-`v0.1.0`. The GitHub workflow runs the tests, builds `fluidmeet.mcpb` and attaches it to the release.
+Releases follow git flow (`dev` → `release/X.Y.Z` → `main`). Bump `version` in `pyproject.toml`,
+`manifest.json` and `src/fluidmeet_mcp/__init__.py`, finish the release, and push `main`. On every push
+to `main`, the workflow runs the tests, builds `fluidmeet.mcpb` and publishes GitHub release
+`vX.Y.Z` with the bundle attached. It reuses the tag if you pushed it, or creates it otherwise.
 
 ## License
 
