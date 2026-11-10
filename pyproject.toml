@@ -1,0 +1,44 @@
+[project]
+name = "fluidmeet-mcp"
+version = "0.1.0"
+description = "Local, read-only MCP server that lets Claude read your FluidVoice / FluidMeet meeting transcripts via fv-serve"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "dl6nm" }]
+requires-python = ">=3.11"
+keywords = ["mcp", "fluidvoice", "fluidmeet", "meetings", "transcripts", "claude"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: MacOS",
+    "Programming Language :: Python :: 3",
+    "Topic :: Office/Business",
+]
+dependencies = [
+    "fastmcp>=4.1,<5",
+]
+
+[project.urls]
+Homepage = "https://github.com/dl6nm/fluid-meet-mcp-server"
+Repository = "https://github.com/dl6nm/fluid-meet-mcp-server"
+Issues = "https://github.com/dl6nm/fluid-meet-mcp-server/issues"
+
+[project.scripts]
+fluidmeet-mcp = "fluidmeet_mcp.server:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/fluidmeet_mcp"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

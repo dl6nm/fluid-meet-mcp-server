@@ -1,0 +1,55 @@
+{
+  "manifest_version": "0.4",
+  "name": "fluidmeet",
+  "display_name": "FluidMeet (FluidVoice meetings)",
+  "version": "0.1.0",
+  "description": "Read your FluidVoice / FluidMeet meeting transcripts and summaries in Claude - locally and read-only.",
+  "long_description": "Lets Claude list, search and read the meetings you recorded with FluidVoice (FluidMeet) on this Mac. It calls FluidVoice's bundled read-only helper `fv-serve`; nothing leaves your Mac except what Claude reads into the conversation, and no files are accessed directly. Requires FluidVoice with FluidMeet. In FluidVoice, open FluidMeet settings > Integrations and allow agent access first.",
+  "author": {
+    "name": "dl6nm",
+    "url": "https://github.com/dl6nm"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dl6nm/fluid-meet-mcp-server"
+  },
+  "homepage": "https://github.com/dl6nm/fluid-meet-mcp-server",
+  "support": "https://github.com/dl6nm/fluid-meet-mcp-server/issues",
+  "icon": "icon.png",
+  "server": {
+    "type": "uv",
+    "entry_point": "src/fluidmeet_mcp/server.py",
+    "mcp_config": {
+      "command": "uv",
+      "args": ["run", "--directory", "${__dirname}", "src/fluidmeet_mcp/server.py"],
+      "env": {
+        "FLUIDMEET_FV_SERVE": "${user_config.fv_serve_path}"
+      }
+    }
+  },
+  "user_config": {
+    "fv_serve_path": {
+      "type": "string",
+      "title": "Path to fv-serve",
+      "description": "Only change this if FluidVoice is not installed in /Applications.",
+      "default": "/Applications/FluidVoice.app/Contents/Helpers/fv-serve",
+      "required": false
+    }
+  },
+  "tools": [
+    { "name": "meet_list", "description": "List recorded meetings (newest first) with ids, dates, speakers and titles." },
+    { "name": "meet_show", "description": "Read a meeting transcript, optionally only a time window (from/to)." },
+    { "name": "meet_summary", "description": "Return summaries already saved in FluidVoice for a meeting." },
+    { "name": "meet_search", "description": "Search transcripts for text; returns matching lines with timestamps." },
+    { "name": "status", "description": "Check whether FluidVoice meetings are accessible." },
+    { "name": "skill", "description": "Return FluidVoice's own usage guide for fv-serve." }
+  ],
+  "keywords": ["fluidvoice", "fluidmeet", "meetings", "transcripts", "notes"],
+  "license": "MIT",
+  "compatibility": {
+    "platforms": ["darwin"],
+    "runtimes": {
+      "python": ">=3.11"
+    }
+  }
+}
